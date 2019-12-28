@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 sts_client = boto3.client('sts')
-assumed_role_object=sts_client.assume_role(RoleArn="arn:aws:iam::xxxxx:role/alexa_assume_s3", RoleSessionName="AssumeRoleSession")
-credentials=assumed_role_object['Credentials']
+assumed_role_object = sts_client.assume_role(RoleArn="arn:aws:iam::xxxxx:role/alexa_assume_s3", RoleSessionName="AssumeRoleSession")
+credentials = assumed_role_object['Credentials']
 
 s3_client = boto3.client('s3',
                         aws_access_key_id=credentials['AccessKeyId'],
@@ -200,7 +200,6 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
                 .response
         )
 
-
 class SessionEndedRequestHandler(AbstractRequestHandler):
     """Handler for Session End."""
     def can_handle(self, handler_input):
@@ -213,7 +212,6 @@ class SessionEndedRequestHandler(AbstractRequestHandler):
         # Any cleanup logic goes here.
 
         return handler_input.response_builder.response
-
 
 class IntentReflectorHandler(AbstractRequestHandler):
     """The intent reflector is used for interaction model testing and debugging.
@@ -236,7 +234,6 @@ class IntentReflectorHandler(AbstractRequestHandler):
                 # .ask("add a reprompt if you want to keep the session open for the user to respond")
                 .response
         )
-
 
 class CatchAllExceptionHandler(AbstractExceptionHandler):
     """Generic error handling to capture any syntax or routing errors. If you receive an error
