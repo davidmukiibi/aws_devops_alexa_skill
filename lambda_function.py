@@ -137,8 +137,6 @@ s3_client = boto3.client('s3',
                         aws_session_token=credentials['SessionToken'],
                         region_name='us-east-1')
 
-response = s3_client.list_buckets()
-
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
     def can_handle(self, handler_input):
@@ -162,6 +160,7 @@ class ListBucketsIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("ListBucketsIntent")(handler_input)
 
     def handle(self, handler_input):
+        response = s3_client.list_buckets()
         list_of_buckets = ""
         name_count = len(response['Buckets'])
         # for i in response['Buckets']
@@ -189,14 +188,7 @@ class CreateBucketIntentHandler(AbstractRequestHandler):
         speak_output = ""
         # Create bucket
         try:
-            if region is None:
-                s3_client = boto3.client('s3')
-                s3_client.create_bucket(Bucket=bucket_name)
-            else:
-                s3_client = boto3.client('s3', region_name=region)
-                location = {'LocationConstraint': region}
-                s3_client.create_bucket(Bucket=bucket_name,
-                                        CreateBucketConfiguration=location)
+            s3_client.create_bucket(Bucket=bucket_name)
         except ClientError as e:
             logging.error(e)
             if e.response['Error']['Code'] == "BucketAlreadyExists":
@@ -212,6 +204,8 @@ class CreateBucketIntentHandler(AbstractRequestHandler):
         bucket_name = get_slot_value(handler_input=handler_input, slot_name="bucket_name")
         if self.create_bucket(bucket_name):
             speak_output += "{} bucket has been created successfully.".format(bucket_name)
+        else:
+            speak_output += "The requested bucket name is either not available, already exists or not unique to AWS, please select a different name and try again."
         return (
             handler_input.response_builder
             .speak(speak_output)
