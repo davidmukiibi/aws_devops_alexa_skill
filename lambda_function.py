@@ -182,6 +182,18 @@ class DeleteBucketIntentHandler(AbstractRequestHandler):
         else:
             return False
 
+    def delete_bucket(self, bucket_name):
+        try:
+            if check_bucket_exists(bucket_name):
+                response = s3_client.delete(bucket_name)
+                return True
+            else:
+                return False
+        except ClientError as e:
+            logging.error(e)
+            return False
+        return True
+
     def can_handle(self, handler_input):
         return ask_utils.is_intent_name("DeleteBucketIntent")(handler_input)
 
