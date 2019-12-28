@@ -128,7 +128,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 sts_client = boto3.client('sts')
-assumed_role_object=sts_client.assume_role(RoleArn="arn:aws:iam::aws:policy/AmazonS3FullAccess", RoleSessionName="AssumeRoleSession")
+assumed_role_object=sts_client.assume_role(RoleArn="arn:aws:iam::xxxxx:role/alexa_assume_s3", RoleSessionName="AssumeRoleSession")
 credentials=assumed_role_object['Credentials']
 
 s3_client = boto3.client('s3',
@@ -185,9 +185,8 @@ class ListBucketsIntentHandler(AbstractRequestHandler):
 
 class CreateBucketIntentHandler(AbstractRequestHandler):
     """Handler for CreateBucket Intent."""
-
-    speak_output = ""
     def create_bucket(self, bucket_name, region=None):
+        speak_output = ""
         # Create bucket
         try:
             if region is None:
@@ -200,6 +199,8 @@ class CreateBucketIntentHandler(AbstractRequestHandler):
                                         CreateBucketConfiguration=location)
         except ClientError as e:
             logging.error(e)
+            if e.response['Error']['Code'] == "BucketAlreadyExists":
+                speak_output += "The requested bucket name is either not available, already exists or not unique to AWS, please select a different name and try again."
             return False
         return True
 
@@ -207,12 +208,10 @@ class CreateBucketIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("CreateBucketIntent")(handler_input)
 
     def handle(self, handler_input):
+        speak_output = ""
         bucket_name = get_slot_value(handler_input=handler_input, slot_name="bucket_name")
         if self.create_bucket(bucket_name):
             speak_output += "{} bucket has been created successfully.".format(bucket_name)
-        else:
-            speak_output += "sorry, the requested bucket could not be created."
-
         return (
             handler_input.response_builder
             .speak(speak_output)
