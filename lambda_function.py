@@ -1,87 +1,12 @@
-
-
-# class NumberOfBucketsIntentHandler(AbstractRequestHandler):
-#     """Handler for NumberOfBuckets Intent."""
-
-#     def number_of_buckets(self):
-#         s3_client = boto3.client('s3')
-#         response = s3_client.list_buckets()
-#         try:
-#             if response:
-#                 speak_output = "You have {} buckets.".format(len(response['Buckets']))
-#             else:
-#                 speak_output = "Sorry sir, you have no buckets in your account yet."
-
-#         except ClientError as e:
-#             logging.error(e)
-#             return False
-#         return True
-
-#     def can_handle(self, handler_input):
-#         return ask_utils.is_intent_name("NumberOfBucketsIntent")(handler_input)
-
-#     def handle(self, handler_input):
-#         number_of_buckets()
-#         return (
-#             handler_input.response_builder
-#             .speak(number_of_buckets().speak_output)
-#             .ask("Sorry, didn't quite get that, could you please repeat your request.")
-#             .response
-#         )
-
-# class ListBucketsIntentHandler(AbstractRequestHandler):
-#     """Handler for ListBuckets Intent."""
-
-#     def list_buckets(self):
-#         s3_client = boto3.client('s3')
-#         response = s3_client.list_buckets()
-#         list_of_buckets = ""
-#         for bucket in response['Buckets']:
-#             list_of_buckets += bucket["Name"]
-#             # print(f'  {bucket["Name"]}')
-#             try:
-#                 if response:
-#                     speak_output = "Your buckets are {}.".format(list_of_buckets)
-#                 else:
-#                     speak_output = "Sorry sir, you have no buckets in your account yet."
-
-#             except ClientError as e:
-#                 logging.error(e)
-#                 return False
-#             return True
-
-#     def can_handle(self, handler_input):
-#         return ask_utils.is_intent_name("ListBucketsIntentHandler")(handler_input)
-
-#     def handle(self, handler_input):
-#         list_buckets()
-#         return (
-#             handler_input.response_builder
-#             .speak(list_buckets().speak_output)
-#             .ask("Sorry, didn't quite get that, could you please repeat your request.")
-#             .response
-#         )
-
-
-
-# devops cloud assistant
-# what s three buckets do i have
-# create me a bucket with the name {bucket_name}
-
-
 import logging
-import ask_sdk_core.utils as ask_utils
-from ask_sdk_core.utils import is_intent_name, get_slot_value
-from botocore.exceptions import ClientError
-
 import boto3
-
+import ask_sdk_core.utils as ask_utils
+# from ask_sdk_model import Response
+from botocore.exceptions import ClientError
 from ask_sdk_core.skill_builder import SkillBuilder
-from ask_sdk_core.dispatch_components import AbstractRequestHandler
-from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_core.handler_input import HandlerInput
-
-from ask_sdk_model import Response
+from ask_sdk_core.utils import is_intent_name, get_slot_value
+from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -213,6 +138,34 @@ class DeleteBucketIntentHandler(AbstractRequestHandler):
             .response
         )
 
+class NumberOfBucketsIntentHandler(AbstractRequestHandler):
+    """Handler for NumberOfBuckets Intent."""
+
+    def number_of_buckets(self):
+        response = s3_client.list_buckets()
+        try:
+            if response:
+                speak_output = "You have {} buckets.".format(len(response['Buckets']))
+            else:
+                speak_output = "Sorry sir, you have no buckets in your account yet."
+
+        except ClientError as e:
+            logging.error(e)
+            return False
+        return True
+
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("NumberOfBucketsIntent")(handler_input)
+
+    def handle(self, handler_input):
+        number_of_buckets()
+        return (
+            handler_input.response_builder
+            .speak(number_of_buckets().speak_output)
+            .ask("Sorry, didn't quite get that, could you please repeat your request.")
+            .response
+        )
+
 class HelpIntentHandler(AbstractRequestHandler):
     """Handler for Help Intent."""
     def can_handle(self, handler_input):
@@ -318,6 +271,7 @@ sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(ListBucketsIntentHandler())
 sb.add_request_handler(CreateBucketIntentHandler())
 sb.add_request_handler(DeleteBucketIntentHandler())
+sb.add_request_handler(NumberOfBucketsIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
@@ -326,4 +280,9 @@ sb.add_request_handler(IntentReflectorHandler()) # make sure IntentReflectorHand
 sb.add_exception_handler(CatchAllExceptionHandler())
 
 lambda_handler = sb.lambda_handler()
+
+
+# devops cloud assistant
+# what s three buckets do i have
+# create me a bucket with the name {bucket_name}
 
