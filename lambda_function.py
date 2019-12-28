@@ -1,45 +1,4 @@
-# class DeleteBucketIntentHandler(AbstractRequestHandler):
-#     """Handler for DeleteBucket Intent."""
 
-#     def check_bucket_exists(self, bucket_name):
-#         s3_bucket_client = boto3.client('s3')
-#         buckets_response = s3_bucket_client.list_buckets()
-#         if bucket_name in buckets_response['Buckets']:
-#             return True
-#         else:
-#             return False
-
-#     def delete_bucket(self, bucket_name):
-#         try:
-#             if check_bucket_exists(bucket_name):
-#                 s3_bucket_client = boto3.client('s3')
-#                 response = s3_bucket_client.delete(bucket_name)
-#                 return True
-#             else:
-#                 return False
-#         except ClientError as e:
-#             logging.error(e)
-#             return False
-#         return True
-
-#     def can_handle(self, handler_input):
-#         return ask_utils.is_intent_name("DeleteBucketIntent")(handler_input)
-
-#     def handle(self, handler_input):
-#         bucket_name = handler_input.attributes_manager.request_attributes["bucket_name"]
-#         if delete_bucket(bucket_name):
-#             speak_output = "{} bucket has been deleted successfully.".format(bucket_name)
-#         else:
-#             speak_output = "sorry, the requested bucket could not be deleted, make sure you \
-#             have deleted all files in the bucket before you attempt deleting it or you could \
-#                 try saying \"alexa, delete all files in {} bucket.\"".format(bucket_name)
-
-#         return (
-#             handler_input.response_builder
-#             .speak(speak_output)
-#             .ask("Sorry, didn't quite get that, could you please repeat your request.")
-#             .response
-#         )
 
 # class NumberOfBucketsIntentHandler(AbstractRequestHandler):
 #     """Handler for NumberOfBuckets Intent."""
@@ -210,6 +169,28 @@ class CreateBucketIntentHandler(AbstractRequestHandler):
             handler_input.response_builder
             .speak(speak_output)
             .ask("Sorry, didn't quite get that, could you please repeat your request.")
+            .response
+        )
+
+class DeleteBucketIntentHandler(AbstractRequestHandler):
+    """Handler for DeleteBucket Intent."""
+
+    def can_handle(self, handler_input):
+        return ask_utils.is_intent_name("DeleteBucketIntent")(handler_input)
+
+    def handle(self, handler_input):
+        bucket_name = handler_input.attributes_manager.request_attributes["bucket_name"]
+        if delete_bucket(bucket_name):
+            speak_output = "{} bucket has been deleted successfully.".format(bucket_name)
+        else:
+            speak_output = "sorry, the requested bucket could not be deleted, make sure you \
+            have deleted all files in the bucket before you attempt deleting it or you could \
+                try saying \"alexa, delete all files in {} bucket.\"".format(bucket_name)
+
+        return (
+            handler_input.response_builder
+            .speak(speak_output)
+            .ask("Sorry, didn't quite get that, could you please repeat your request")
             .response
         )
 
